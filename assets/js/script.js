@@ -44,7 +44,7 @@ const bingoItems = {
     "Juontajat puhuvat useilla kielillä",
     "Esiintyjä on paljain jaloin",
     "Tanssijat nostavat laulajan ilmaan",
-    "Laulaja laulaa nuotin vierestä",
+    "Laulua nuotin vierestä",
     "Jodlaus mainittu",
     "Ruotsin voittojen määrä mainittu",
     "Irlannin voittojen määrä mainittu",
@@ -53,7 +53,7 @@ const bingoItems = {
     "12 pistettä naapurimaalle",
     "Akrobatiaa lavalla",
     "Erikoiset kameraperspektiivit",
-    "Puolialastomat taustatanssijat",
+    "Puolialastomat tanssijat",
     "Balladi",
     "Laulajalla yliampuva asu",
     "Maailmanrauha sanoituksessa",
@@ -63,7 +63,7 @@ const bingoItems = {
     "Esiintyjä mainitsee maansa nimen",
     "Suomea ei taaskaan ymmärretty",
     "Kommentaattori mainitsee politiikan",
-    "Esityksessä harvinainen soitin",
+    "Harvinainen soitin",
     "Menneiden aikojen euroviisutähdet",
   ],
   en: [
@@ -86,7 +86,7 @@ const bingoItems = {
     "Hosts speak in multiple languages",
     "Performer is barefoot",
     "Dancers lift the singer in the air",
-    "Singer sings off-key",
+    "Singing off-key",
     "Yodeling mentioned",
     "Number of Swedish wins mentioned",
     "Number of Irish wins mentioned",
@@ -105,7 +105,7 @@ const bingoItems = {
     "Performer mentions their country's name",
     "Finland was misunderstood again",
     "Commentator mentions politics",
-    "Rare instrument in performance",
+    "Rare instrument",
     "Eurovision stars from the past"
   ]
 };
