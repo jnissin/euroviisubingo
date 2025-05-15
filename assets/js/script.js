@@ -1,6 +1,6 @@
-// Language support
-let currentLang = 'fi'; // Default language
-let currentGridIndices = []; // Store current grid indices
+let currentLang = 'fi';           // Default language
+let currentGridIndices = [];      // Store current grid indices
+let completedBingos = new Map();  // Track completed bingo patterns and their states
 
 // Confetti configuration
 const CONFETTI_CONFIG = {
@@ -65,6 +65,14 @@ const bingoItems = {
     "Kommentaattori mainitsee politiikan",
     "Harvinainen soitin",
     "Menneiden aikojen euroviisutähdet",
+    "Täysin valkoinen esiintymisasu",
+    "Täysin hopeinen esiintymisasu",
+    "Laulu rakkaudesta",
+    "Hidastettu juoksu",
+    "Nahka-asu",
+    "Esiintyjä on entinen Idols kilpailija",
+    "Technotausta",
+    "Savuefekti"
   ],
   en: [
     "Key change",
@@ -106,7 +114,15 @@ const bingoItems = {
     "Finland was misunderstood again",
     "Commentator mentions politics",
     "Rare instrument",
-    "Eurovision stars from the past"
+    "Eurovision stars from the past",
+    "All-white outfit",
+    "All-silver outfit",
+    "Love song",
+    "Slow-motion running",
+    "Leather outfit",
+    "Former Idol contestant",
+    "Techno backing track",
+    "Smoke effect"
   ]
 };
 
@@ -160,14 +176,49 @@ function checkForBingo() {
     )
   );
   
-  // Check rows and columns
+  let newBingos = [];
+  
+  // Check rows
   for (let i = 0; i < gridSize; i++) {
-    if (grid[i].every(cell => cell) || grid.every(row => row[i])) return true;
+    const isComplete = grid[i].every(cell => cell);
+    const pattern = `row${i}`;
+    const wasComplete = completedBingos.get(pattern);
+    
+    if (isComplete && !wasComplete) {
+      newBingos.push(pattern);
+    }
+    completedBingos.set(pattern, isComplete);
   }
   
-  // Check diagonals
-  return grid.every((row, i) => grid[i][i]) || // Main diagonal
-         grid.every((row, i) => grid[i][gridSize - 1 - i]); // Anti-diagonal
+  // Check columns
+  for (let i = 0; i < gridSize; i++) {
+    const isComplete = grid.every(row => row[i]);
+    const pattern = `col${i}`;
+    const wasComplete = completedBingos.get(pattern);
+    
+    if (isComplete && !wasComplete) {
+      newBingos.push(pattern);
+    }
+    completedBingos.set(pattern, isComplete);
+  }
+  
+  // Check main diagonal
+  const mainDiagComplete = grid.every((row, i) => grid[i][i]);
+  const wasMainDiagComplete = completedBingos.get('mainDiag');
+  if (mainDiagComplete && !wasMainDiagComplete) {
+    newBingos.push('mainDiag');
+  }
+  completedBingos.set('mainDiag', mainDiagComplete);
+  
+  // Check anti-diagonal
+  const antiDiagComplete = grid.every((row, i) => grid[i][gridSize - 1 - i]);
+  const wasAntiDiagComplete = completedBingos.get('antiDiag');
+  if (antiDiagComplete && !wasAntiDiagComplete) {
+    newBingos.push('antiDiag');
+  }
+  completedBingos.set('antiDiag', antiDiagComplete);
+  
+  return newBingos.length > 0;
 }
 
 // Function to create confetti celebration
@@ -213,6 +264,8 @@ function createConfetti() {
 function generateBingoCard(lang = currentLang) {
   const bingoGrid = document.getElementById('bingo-grid');
   bingoGrid.innerHTML = '';
+  // Reset completed bingos when generating new card
+  completedBingos.clear();
   
   // Generate new random indices
   currentGridIndices = shuffleArray(Array.from(
