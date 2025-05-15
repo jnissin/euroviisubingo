@@ -1,0 +1,212 @@
+:root {
+  --primary-color: #0047AB;
+  --secondary-color: #FF1493;
+  --background-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  --glass-background: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --selected-color: rgba(255, 215, 0, 0.7);
+  --text-color: white;
+  --button-color: #5B4B8A;
+  --cell-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --cell-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  --selected-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: var(--background-gradient);
+  color: var(--text-color);
+  line-height: 1.6;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: white;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.description {
+  color: var(--text-color);
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.language-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.language-btn {
+  background-color: var(--button-color);
+  padding: 8px 16px;
+}
+
+.language-btn.active {
+  background-color: #4a3d70;
+}
+
+.bingo-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  background: var(--glass-background);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+  aspect-ratio: 1/1;
+  width: 100%;
+}
+
+.bingo-cell {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  background: var(--glass-background);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--cell-shadow);
+}
+
+.bingo-cell-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  font-size: clamp(0.65rem, 1.3vw, 0.9rem);
+  word-wrap: break-word;
+  overflow: hidden;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  color: var(--text-color);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+}
+
+.bingo-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cell-hover-shadow);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bingo-cell.selected {
+  background: var(--selected-color);
+  transform: scale(0.98);
+  box-shadow: var(--selected-shadow);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.bingo-cell.selected .bingo-cell-content {
+  color: var(--text-color);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+button {
+  background-color: var(--button-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--cell-shadow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cell-hover-shadow);
+  background-color: #6d5ba1;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-color);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.footer-links {
+  margin-top: 10px;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--selected-color);
+}
+
+@media (max-width: 400px) {
+  .bingo-cell-content {
+    font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+    padding: 4px;
+  }
+}
+
+[lang="fi"] .bingo-cell-content {
+  word-break: break-word;
+  -webkit-locale: "fi";
+  locale: "fi";
+}
+
+[lang="en"] .bingo-cell-content {
+  word-break: break-word;
+  -webkit-locale: "en";
+  locale: "en";
+} 

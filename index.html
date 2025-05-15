@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Euroviisubingo</title>
+  <meta name="description" content="Play Eurovision Bingo while watching Eurovision Song Contest! Mark events as they happen during the show.">
+  <meta name="keywords" content="Eurovision, Bingo, Game, Eurovision Song Contest">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="assets/js/script.js" defer></script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+</head>
+<body>
+  <header>
+    <h1 data-fi="Euroviisubingo" data-en="Eurovision Bingo">Euroviisubingo</h1>
+    <p class="description" data-fi="Elä mukana Euroviisujen tapahtumissa euroviisubingon kanssa!" data-en="Live the Eurovision experience with Eurovision Bingo!">Elä mukana Euroviisujen tapahtumissa euroviisubingon kanssa!</p>
+  </header>
+  
+  <div class="language-toggle">
+    <button class="language-btn active" data-lang="fi">🇫🇮 FI</button>
+    <button class="language-btn" data-lang="en">🇬🇧 EN</button>
+  </div>
+  
+  <div class="bingo-container">
+    <div class="buttons">
+      <button id="reset-button" data-fi="🎲 Uusi kortti" data-en="🎲 New Card">🎲 Uusi kortti</button>
+      <button id="clear-button" data-fi="🧹 Tyhjennä valinnat" data-en="🧹 Clear Selections">🧹 Tyhjennä valinnat</button>
+    </div>
+    <div class="bingo-grid" id="bingo-grid" lang="fi"></div>
+  </div>
+  
+  <footer>
+    <p data-fi="Päivitä sivu tai klikkaa 'Uusi kortti' saadaksesi uuden bingokortin." data-en="Refresh the page or click 'New Card' for a new bingo card.">Päivitä sivu tai klikkaa 'Uusi kortti' saadaksesi uuden bingokortin.</p>
+    <div class="footer-links">
+      <a href="https://github.com/jnissin/euroviisubingo" target="_blank">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html> 
