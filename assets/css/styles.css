@@ -10,6 +10,7 @@
   --cell-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --cell-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   --selected-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --fallback-cell-bg: rgba(91, 75, 138, 0.3); /* Fallback background for mobile */
 }
 
 * {
@@ -92,14 +93,21 @@ h1 {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  background: var(--glass-background);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--fallback-cell-bg);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--cell-shadow);
+}
+
+/* Apply glass effect only on devices that support it */
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .bingo-cell {
+    background: var(--glass-background);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 
 .bingo-cell-content {
@@ -122,6 +130,9 @@ h1 {
   color: var(--text-color);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   font-weight: bold;
+  /* Ensure text is visible on all backgrounds */
+  mix-blend-mode: normal;
+  background: transparent;
 }
 
 .bingo-cell:hover {
