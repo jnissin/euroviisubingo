@@ -2,15 +2,14 @@
   --primary-color: #0047AB;
   --secondary-color: #FF1493;
   --background-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  --glass-background: rgba(255, 255, 255, 0.15);
-  --glass-border: rgba(255, 255, 255, 0.2);
+  --cell-bg: rgba(255, 255, 255, 0.2);
+  --cell-border: rgba(255, 255, 255, 0.3);
   --selected-color: rgba(255, 215, 0, 0.7);
   --text-color: white;
   --button-color: #5B4B8A;
-  --cell-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --cell-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  --selected-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  --fallback-cell-bg: rgba(91, 75, 138, 0.3); /* Fallback background for mobile */
+  --button-hover: #6d5ba1;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -40,14 +39,14 @@ h1 {
   color: white;
   text-align: center;
   margin-bottom: 20px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: var(--shadow);
 }
 
 .description {
   color: var(--text-color);
   text-align: center;
   margin-bottom: 30px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: var(--shadow);
 }
 
 .language-toggle {
@@ -63,7 +62,7 @@ h1 {
 }
 
 .language-btn.active {
-  background-color: #4a3d70;
+  background-color: var(--button-hover);
 }
 
 .bingo-container {
@@ -72,12 +71,10 @@ h1 {
   margin: 0 auto;
   padding: 20px;
   position: relative;
-  background: var(--glass-background);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
+  background: var(--cell-bg);
+  border: 1px solid var(--cell-border);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .bingo-grid {
@@ -93,21 +90,12 @@ h1 {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  background: var(--fallback-cell-bg);
-  border: 1px solid var(--glass-border);
+  background: var(--cell-bg);
+  border: 1px solid var(--cell-border);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--cell-shadow);
-}
-
-/* Apply glass effect only on devices that support it */
-@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-  .bingo-cell {
-    background: var(--glass-background);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow);
 }
 
 .bingo-cell-content {
@@ -128,28 +116,20 @@ h1 {
   -webkit-hyphens: auto;
   -ms-hyphens: auto;
   color: var(--text-color);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: var(--shadow);
   font-weight: bold;
-  /* Ensure text is visible on all backgrounds */
-  mix-blend-mode: normal;
-  background: transparent;
 }
 
 .bingo-cell:hover {
   transform: translateY(-2px);
-  box-shadow: var(--cell-hover-shadow);
-  background: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--hover-shadow);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .bingo-cell.selected {
   background: var(--selected-color);
   transform: scale(0.98);
-  box-shadow: var(--selected-shadow);
-  border-color: rgba(255, 215, 0, 0.3);
-}
-
-.bingo-cell.selected .bingo-cell-content {
-  color: var(--text-color);
+  border-color: rgba(255, 215, 0, 0.5);
 }
 
 .buttons {
@@ -167,8 +147,8 @@ button {
   padding: 12px 24px;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--cell-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -176,17 +156,17 @@ button {
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: var(--cell-hover-shadow);
-  background-color: #6d5ba1;
+  box-shadow: var(--hover-shadow);
+  background-color: var(--button-hover);
 }
 
 footer {
   text-align: center;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid var(--glass-border);
+  border-top: 1px solid var(--cell-border);
   color: var(--text-color);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: var(--shadow);
 }
 
 .footer-links {
@@ -196,7 +176,7 @@ footer {
 .footer-links a {
   color: white;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
