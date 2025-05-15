@@ -1,6 +1,6 @@
 let currentLang = 'fi';           // Default language
 let currentGridIndices = [];      // Store current grid indices
-let completedBingos = new Map();  // Track completed bingo patterns and their states
+let currentBingoCount = 0;        // Track current number of completed bingos
 
 // Confetti configuration
 const CONFETTI_CONFIG = {
@@ -176,49 +176,40 @@ function checkForBingo() {
     )
   );
   
-  let newBingos = [];
+  let totalBingos = 0;
   
   // Check rows
   for (let i = 0; i < gridSize; i++) {
-    const isComplete = grid[i].every(cell => cell);
-    const pattern = `row${i}`;
-    const wasComplete = completedBingos.get(pattern);
-    
-    if (isComplete && !wasComplete) {
-      newBingos.push(pattern);
+    if (grid[i].every(cell => cell)) {
+      totalBingos++;
     }
-    completedBingos.set(pattern, isComplete);
   }
   
   // Check columns
   for (let i = 0; i < gridSize; i++) {
-    const isComplete = grid.every(row => row[i]);
-    const pattern = `col${i}`;
-    const wasComplete = completedBingos.get(pattern);
-    
-    if (isComplete && !wasComplete) {
-      newBingos.push(pattern);
+    if (grid.every(row => row[i])) {
+      totalBingos++;
     }
-    completedBingos.set(pattern, isComplete);
   }
   
   // Check main diagonal
-  const mainDiagComplete = grid.every((row, i) => grid[i][i]);
-  const wasMainDiagComplete = completedBingos.get('mainDiag');
-  if (mainDiagComplete && !wasMainDiagComplete) {
-    newBingos.push('mainDiag');
+  if (grid.every((row, i) => grid[i][i])) {
+    totalBingos++;
   }
-  completedBingos.set('mainDiag', mainDiagComplete);
   
   // Check anti-diagonal
-  const antiDiagComplete = grid.every((row, i) => grid[i][gridSize - 1 - i]);
-  const wasAntiDiagComplete = completedBingos.get('antiDiag');
-  if (antiDiagComplete && !wasAntiDiagComplete) {
-    newBingos.push('antiDiag');
+  if (grid.every((row, i) => grid[i][gridSize - 1 - i])) {
+    totalBingos++;
   }
-  completedBingos.set('antiDiag', antiDiagComplete);
   
-  return newBingos.length > 0;
+  // If the number of bingos has changed, update the counter and trigger confetti if increased
+  if (totalBingos !== currentBingoCount) {
+    const shouldTriggerConfetti = totalBingos > currentBingoCount;
+    currentBingoCount = totalBingos;
+    return shouldTriggerConfetti;
+  }
+  
+  return false;
 }
 
 // Function to create confetti celebration
@@ -264,8 +255,8 @@ function createConfetti() {
 function generateBingoCard(lang = currentLang) {
   const bingoGrid = document.getElementById('bingo-grid');
   bingoGrid.innerHTML = '';
-  // Reset completed bingos when generating new card
-  completedBingos.clear();
+  // Reset bingo count when generating new card
+  currentBingoCount = 0;
   
   // Generate new random indices
   currentGridIndices = shuffleArray(Array.from(
