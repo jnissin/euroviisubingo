@@ -199,9 +199,7 @@ h1 {
   height: 100%;
   font-size: clamp(0.7rem, 2.2vw, 0.85rem);
   line-height: 1.2;
-  word-wrap: break-word;
   overflow: hidden;
-  text-overflow: ellipsis;
   color: var(--text-color);
   text-shadow: var(--shadow);
   font-weight: 400;
@@ -209,6 +207,11 @@ h1 {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  hyphens: auto;
 }
 
 .bingo-cell:hover {
@@ -347,25 +350,21 @@ footer {
 
 /* Language-specific styles */
 [lang] .bingo-cell-content {
-  word-break: break-word;
   -webkit-locale: attr(lang);
   locale: attr(lang);
 }
 
 [lang="fi"] .bingo-cell-content {
-  word-break: break-word;
   -webkit-locale: "fi";
   locale: "fi";
 }
 
 [lang="en"] .bingo-cell-content {
-  word-break: break-word;
   -webkit-locale: "en";
   locale: "en";
 }
 
 [lang="fr"] .bingo-cell-content {
-  word-break: break-word;
   -webkit-locale: "fr";
   locale: "fr";
 }
