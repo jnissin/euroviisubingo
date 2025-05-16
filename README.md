@@ -4,6 +4,10 @@ A fun Eurovision Song Contest bingo game where players can mark off common Eurov
 
 The project is live at: [https://euroviisubingo.fi](https://euroviisubingo.fi)
 
+The Eurovision Bingo project was created for entertainment purposes to make watching the Eurovision Song Contest even more fun. Players can mark off various Eurovision clichés and memorable moments on their bingo cards as they occur during the live broadcast.
+
+This project was inspired by the non-digital versions of Eurovision Bingo published by the [Finnish Broadcasting Company (Yle)](https://yle.fi/a/74-20156509).
+
 ## Contributions
 
 All contributions to the project are more than welcome! Here's how you can help:
@@ -19,9 +23,3 @@ All contributions to the project are more than welcome! Here's how you can help:
 - Create a new branch for your feature/fix
 - Make your changes
 - Submit a pull request with a clear description of your changes
-
-## About
-
-This project was created for entertainment purposes to make watching the Eurovision Song Contest even more fun. Players can mark off various Eurovision clichés and memorable moments on their bingo cards as they occur during the live broadcast.
-
-This project is not in any way officially affiliated with the Eurovision Song Contest or the EBU.
