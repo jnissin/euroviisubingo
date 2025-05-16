@@ -200,6 +200,15 @@ function changeLanguage(lang) {
   currentLang = lang;
   updateTextContent(lang);
   
+  // Update URL
+  const url = new URL(window.location.href);
+  if (lang === 'fi') {
+    url.searchParams.delete('lang');
+  } else {
+    url.searchParams.set('lang', lang);
+  }
+  window.history.replaceState({}, '', url);
+  
   // Update language buttons
   document.querySelectorAll('.language-btn').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
@@ -337,6 +346,13 @@ function generateBingoCard(lang = currentLang) {
 
 // Initialize the game
 document.addEventListener('DOMContentLoaded', () => {
+  // Check URL parameters for language
+  const urlParams = new URLSearchParams(window.location.search);
+  const langParam = urlParams.get('lang');
+  if (langParam && ['fi', 'en', 'fr'].includes(langParam)) {
+    changeLanguage(langParam);
+  }
+  
   // Set up language toggle
   document.querySelectorAll('.language-btn').forEach(btn => {
     btn.addEventListener('click', () => changeLanguage(btn.getAttribute('data-lang')));
