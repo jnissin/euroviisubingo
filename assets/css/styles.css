@@ -189,13 +189,11 @@ h1 {
   padding: 4px;
   width: 100%;
   height: 100%;
-  font-size: clamp(0.75rem, 2.5vw, 0.88rem);
+  font-size: clamp(0.75rem, 2.5vw, 0.80rem);
   line-height: 1.2;
   word-wrap: break-word;
   overflow: hidden;
-  hyphens: auto;
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
+  text-overflow: ellipsis;
   color: var(--text-color);
   text-shadow: var(--shadow);
   font-weight: 400;
@@ -297,7 +295,7 @@ footer {
 
   .bingo-cell-content {
     padding: 2px;
-    font-size: clamp(0.7rem, 3vw, 0.9rem);
+    font-size: clamp(0.70rem, 2.5vw, 0.8rem);
   }
 
   .language-btn {
@@ -343,4 +341,10 @@ footer {
   word-break: break-word;
   -webkit-locale: "en";
   locale: "en";
-} 
+}
+
+[lang="fr"] .bingo-cell-content {
+  word-break: break-word;
+  -webkit-locale: "fr";
+  locale: "fr";
+}
