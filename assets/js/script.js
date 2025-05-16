@@ -278,6 +278,7 @@ function saveState() {
   
   try {
     localStorage.setItem('euroviisubingo', JSON.stringify(state));
+    console.log('State saved successfully, seed:', currentSeed);
   } catch (e) {
     console.warn('Failed to save game state to localStorage:', e);
   }
@@ -637,7 +638,14 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const saved = localStorage.getItem('euroviisubingo');
       if (saved) {
+        const parsedState = JSON.parse(saved);
+        console.log('Loading saved state, seed:', parsedState.seed);
+
         loadState();
+
+        // Force a re-save after loading to ensure state is preserved
+        // This fixes the issue with reloading twice without making selections
+        setTimeout(saveState, 100);
       } else {
         currentSeed = generateSeed();
         generateBingoCard(); 
