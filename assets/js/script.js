@@ -177,6 +177,24 @@ const bingoItems = {
   ]
 };
 
+function isLocalStorageAvailable() {
+  try {
+    const test = '__storage_test__';
+    localStorage.setItem(test, test);
+    testFromStorage = localStorage.getItem(test);
+    
+    if (testFromStorage !== test) {
+      console.warn('Failed to retrieve test item from local storage');
+      return false;
+    }
+    
+    localStorage.removeItem(test);
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
 // Function to generate a hash of the bingo items
 function generateContentHash() {
   const items = Object.values(bingoItems).flat();
@@ -238,6 +256,12 @@ function updateLanguageUI(lang) {
 
 // Function to save state to local storage
 function saveState() {
+  // Check if localStorage is available
+  if (!isLocalStorageAvailable()) {
+    console.warn('localStorage is not available in this browser');
+    return;
+  }
+
   // Don't save if grid indices haven't been generated yet
   if (!currentGridIndices.length || !document.querySelectorAll('.bingo-cell').length) {
     return;
@@ -261,6 +285,12 @@ function saveState() {
 
 // Function to load state from local storage
 function loadState() {
+  // Check if localStorage is available
+  if (!isLocalStorageAvailable()) {
+    console.warn('localStorage is not available in this browser');
+    return;
+  }
+
   let saved;
   
   try {
@@ -530,27 +560,35 @@ document.addEventListener('DOMContentLoaded', () => {
   if (resetButton) {
     resetButton.addEventListener('click', () => {
       currentSeed = generateSeed();
-      try {
-        localStorage.removeItem('euroviisubingo');
-      } catch (e) {
-        console.warn('Failed to remove item from localStorage:', e);
+      if (isLocalStorageAvailable()) {
+        try {
+          localStorage.removeItem('euroviisubingo');
+        } catch (e) {
+          console.warn('Failed to remove item from localStorage:', e);
+        }
       }
       generateBingoCard();
     });
   }
   
-  // Load saved state or generate initial card
-  try {
-    const saved = localStorage.getItem('euroviisubingo');
-    if (saved) {
-      loadState();
-    } else {
+  // Check if localStorage is available before attempting to load saved state
+  if (isLocalStorageAvailable()) {
+    try {
+      const saved = localStorage.getItem('euroviisubingo');
+      if (saved) {
+        loadState();
+      } else {
+        currentSeed = generateSeed();
+        generateBingoCard(); 
+      }
+    } catch (e) {
+      console.warn('Error during initialization:', e);
+      // Fallback to ensure something is shown
       currentSeed = generateSeed();
-      generateBingoCard(); 
+      generateBingoCard();
     }
-  } catch (e) {
-    console.warn('Error during initialization:', e);
-    // Fallback to ensure something is shown
+  } else {
+    console.warn('localStorage is not available, starting with a new game');
     currentSeed = generateSeed();
     generateBingoCard();
   }
