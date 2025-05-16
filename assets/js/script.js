@@ -1,6 +1,7 @@
 let currentLang = 'fi';           // Default language
 let currentGridIndices = [];      // Store current grid indices
 let currentBingoCount = 0;        // Track current number of completed bingos
+let currentSeed;                  // Store current seed for reproducible grid generation
 
 // Confetti configuration
 const CONFETTI_CONFIG = {
@@ -22,7 +23,7 @@ const CONFETTI_CONFIG = {
   }
 };
 
-// Eurovision bingo possibilities - Finnish and English
+// Eurovision bingo possibilities - Finnish, English, French
 const bingoItems = {
   fi: [
     "Modulaatio",
@@ -176,9 +177,29 @@ const bingoItems = {
   ]
 };
 
-// Function to shuffle array (Fisher-Yates algorithm)
-function shuffleArray(array) {
+// Function to generate a hash of the bingo items
+function generateContentHash() {
+  const items = Object.values(bingoItems).flat();
+  // Simple but effective string hashing algorithm
+  return items.reduce((hash, item) => {
+    for (let i = 0; i < item.length; i++) {
+      hash = ((hash << 5) - hash) + item.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+  }, 0).toString(36);
+}
+
+// Function to generate a random seed
+function generateSeed() {
+  return Math.floor(Math.random() * 1000000);
+}
+
+// Function to shuffle array with a seed (Fisher-Yates algorithm)
+function shuffleArrayWithSeed(array, seed) {
   const newArray = [...array];
+  Math.seedrandom(seed);
+  
   for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
@@ -193,12 +214,11 @@ function updateTextContent(lang) {
   });
 }
 
-// Function to change language
-function changeLanguage(lang) {
-  if (currentLang === lang) return; // Skip if same language
-  
-  currentLang = lang;
-  updateTextContent(lang);
+// Function to update language UI elements
+function updateLanguageUI(lang) {
+  document.querySelectorAll('.language-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
   
   // Update URL
   const url = new URL(window.location.href);
@@ -209,19 +229,115 @@ function changeLanguage(lang) {
   }
   window.history.replaceState({}, '', url);
   
-  // Update language buttons
-  document.querySelectorAll('.language-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-  });
-
-  // Update bingo grid language attribute and content
+  // Update bingo grid language attribute
   const bingoGrid = document.getElementById('bingo-grid');
-  bingoGrid.setAttribute('lang', lang);
+  if (bingoGrid) {
+    bingoGrid.setAttribute('lang', lang);
+  }
+}
 
-  if (currentGridIndices.length > 0) {
-    bingoGrid.querySelectorAll('.bingo-cell-content').forEach((cell, index) => {
-      cell.textContent = bingoItems[lang][currentGridIndices[index]];
+// Function to save state to local storage
+function saveState() {
+  // Don't save if grid indices haven't been generated yet
+  if (!currentGridIndices.length || !document.querySelectorAll('.bingo-cell').length) {
+    return;
+  }
+
+  const state = {
+    lang: currentLang,
+    seed: currentSeed,
+    contentHash: generateContentHash(),
+    selected: Array.from(document.querySelectorAll('.bingo-cell'))
+      .map((cell, index) => cell.classList.contains('selected') ? index : -1)
+      .filter(index => index !== -1)
+  };
+  
+  try {
+    localStorage.setItem('euroviisubingo', JSON.stringify(state));
+  } catch (e) {
+    console.warn('Failed to save game state to localStorage:', e);
+  }
+}
+
+// Function to load state from local storage
+function loadState() {
+  let saved;
+  
+  try {
+    saved = localStorage.getItem('euroviisubingo');
+  } catch (e) {
+    console.warn('Failed to load game state from localStorage:', e);
+    return;
+  }
+  
+  if (!saved) return;
+  
+  let state;
+  try {
+    state = JSON.parse(saved);
+  } catch (e) {
+    console.warn('Failed to parse saved game state:', e);
+    return;
+  }
+  
+  // Load language first
+  if (state.lang && ['fi', 'en', 'fr'].includes(state.lang)) {
+    currentLang = state.lang;
+    updateTextContent(state.lang);
+    updateLanguageUI(state.lang);
+  }
+  
+  // Check if content has changed
+  const contentChanged = state.contentHash !== generateContentHash();
+  
+  // Handle grid generation
+  if (contentChanged) {
+    console.log('Content has changed, generating new card');
+    currentSeed = generateSeed();
+    generateBingoCard();
+  } else if (state.seed) {
+    currentSeed = state.seed;
+    generateBingoCard();
+    
+    // Restore selected cells only if content hasn't changed
+    if (Array.isArray(state.selected) && state.selected.length > 0) {
+      const cells = document.querySelectorAll('.bingo-cell');
+      state.selected.forEach(index => {
+        if (cells[index]) {
+          cells[index].classList.add('selected');
+        }
+      });
+      // Update bingo count
+      currentBingoCount = 0;
+      checkForBingo();
+    }
+  } else {
+    // Fallback if no seed is found
+    currentSeed = generateSeed();
+    generateBingoCard();
+  }
+}
+
+// Function to change language
+function changeLanguage(lang) {
+  if (currentLang === lang) return; // Skip if same language
+  
+  currentLang = lang;
+  updateTextContent(lang);
+  updateLanguageUI(lang);
+
+  // Update cell content without regenerating the grid
+  const cells = document.querySelectorAll('.bingo-cell-content');
+  if (cells.length > 0 && currentGridIndices.length > 0) {
+    cells.forEach((cell, index) => {
+      if (index < currentGridIndices.length) {
+        cell.textContent = bingoItems[lang][currentGridIndices[index]];
+      }
     });
+    saveState();
+  } else {
+    // If grid is empty, generate it
+    generateBingoCard();
   }
 }
 
@@ -273,6 +389,12 @@ function checkForBingo() {
 
 // Function to create confetti celebration
 function createConfetti() {
+  // Check if confetti library is available
+  if (typeof confetti !== 'function') {
+    console.warn('Confetti library not loaded');
+    return;
+  }
+
   // Initial burst
   confetti(CONFETTI_CONFIG.default);
   
@@ -311,46 +433,91 @@ function createConfetti() {
 }
 
 // Function to generate bingo card
-function generateBingoCard(lang = currentLang) {
+function generateBingoCard() {
   const bingoGrid = document.getElementById('bingo-grid');
+  if (!bingoGrid) {
+    console.error('Bingo grid element not found');
+    return;
+  }
+  
+  // Check if seedrandom is available
+  if (typeof Math.seedrandom !== 'function') {
+    console.warn('seedrandom library not loaded, using standard Math.random');
+  }
+  
   bingoGrid.innerHTML = '';
-  // Reset bingo count when generating new card
   currentBingoCount = 0;
   
-  // Generate new random indices
-  currentGridIndices = shuffleArray(Array.from(
-    { length: bingoItems[lang].length },
-    (_, i) => i
-  )).slice(0, 25);
+  // Ensure we have a valid language
+  if (!bingoItems[currentLang]) {
+    currentLang = 'fi'; // Fallback to Finnish if language is invalid
+  }
   
-  // Create 5x5 grid
-  currentGridIndices.forEach((itemIndex, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'bingo-cell';
+  // Set the language attribute on the grid
+  bingoGrid.setAttribute('lang', currentLang);
+  
+  try {
+    // Generate new random indices using seed
+    currentGridIndices = shuffleArrayWithSeed(
+      Array.from({ length: bingoItems[currentLang].length }, (_, i) => i),
+      currentSeed
+    ).slice(0, 25);
     
-    const content = document.createElement('div');
-    content.className = 'bingo-cell-content';
-    content.textContent = bingoItems[lang][itemIndex];
-    
-    cell.appendChild(content);
-    cell.addEventListener('click', function() {
-      this.classList.toggle('selected');
-      if (checkForBingo()) {
-        setTimeout(createConfetti, 200);
+    // Create 5x5 grid
+    currentGridIndices.forEach((itemIndex, i) => {
+      if (typeof bingoItems[currentLang][itemIndex] === 'undefined') {
+        console.warn(`Missing item at index ${itemIndex} for language ${currentLang}`);
+        return;
       }
+      
+      const cell = document.createElement('div');
+      cell.className = 'bingo-cell';
+      
+      const content = document.createElement('div');
+      content.className = 'bingo-cell-content';
+      content.textContent = bingoItems[currentLang][itemIndex];
+      
+      cell.appendChild(content);
+      cell.addEventListener('click', function() {
+        this.classList.toggle('selected');
+        if (checkForBingo()) {
+          setTimeout(createConfetti, 200);
+        }
+        saveState();
+      });
+      
+      bingoGrid.appendChild(cell);
     });
-    
-    bingoGrid.appendChild(cell);
-  });
+
+    saveState();
+  } catch (e) {
+    console.error('Error generating bingo card:', e);
+  }
 }
 
 // Initialize the game
 document.addEventListener('DOMContentLoaded', () => {
+  // Check if required elements exist
+  if (!document.getElementById('bingo-grid')) {
+    console.error('Required element #bingo-grid not found');
+    return;
+  }
+  
+  if (!document.getElementById('reset-button')) {
+    console.warn('Reset button element not found');
+  }
+  
   // Check URL parameters for language
-  const urlParams = new URLSearchParams(window.location.search);
-  const langParam = urlParams.get('lang');
-  if (langParam && ['fi', 'en', 'fr'].includes(langParam)) {
-    changeLanguage(langParam);
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang');
+    if (langParam && ['fi', 'en', 'fr'].includes(langParam)) {
+      currentLang = langParam;
+      updateTextContent(langParam);
+      updateLanguageUI(langParam);
+    }
+  } catch (e) {
+    console.warn('Error parsing URL parameters:', e);
   }
   
   // Set up language toggle
@@ -359,8 +526,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   // Set up reset button
-  document.getElementById('reset-button').addEventListener('click', () => generateBingoCard());
+  const resetButton = document.getElementById('reset-button');
+  if (resetButton) {
+    resetButton.addEventListener('click', () => {
+      currentSeed = generateSeed();
+      try {
+        localStorage.removeItem('euroviisubingo');
+      } catch (e) {
+        console.warn('Failed to remove item from localStorage:', e);
+      }
+      generateBingoCard();
+    });
+  }
   
-  // Generate initial card
-  generateBingoCard();
+  // Load saved state or generate initial card
+  try {
+    const saved = localStorage.getItem('euroviisubingo');
+    if (saved) {
+      loadState();
+    } else {
+      currentSeed = generateSeed();
+      generateBingoCard(); 
+    }
+  } catch (e) {
+    console.warn('Error during initialization:', e);
+    // Fallback to ensure something is shown
+    currentSeed = generateSeed();
+    generateBingoCard();
+  }
 }); 
