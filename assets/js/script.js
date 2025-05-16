@@ -525,6 +525,43 @@ function generateBingoCard() {
   }
 }
 
+// Function to check if any cells are selected
+function hasSelectedCells() {
+  return document.querySelectorAll('.bingo-cell.selected').length > 0;
+}
+
+// Function to show the reset confirmation modal
+function showResetModal() {
+  const modal = document.getElementById('reset-modal');
+  if (modal) {
+    modal.classList.add('active');
+    // Update modal text content based on current language
+    updateTextContent(currentLang);
+  }
+}
+
+// Function to hide the reset confirmation modal
+function hideResetModal() {
+  const modal = document.getElementById('reset-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+// Function to actually reset the bingo card
+function resetBingoCard() {
+  currentSeed = generateSeed();
+  if (isLocalStorageAvailable()) {
+    try {
+      localStorage.removeItem('euroviisubingo');
+    } catch (e) {
+      console.warn('Failed to remove item from localStorage:', e);
+    }
+  }
+  generateBingoCard();
+  hideResetModal();
+}
+
 // Initialize the game
 document.addEventListener('DOMContentLoaded', () => {
   // Check if required elements exist
@@ -559,17 +596,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetButton = document.getElementById('reset-button');
   if (resetButton) {
     resetButton.addEventListener('click', () => {
-      currentSeed = generateSeed();
-      if (isLocalStorageAvailable()) {
-        try {
-          localStorage.removeItem('euroviisubingo');
-        } catch (e) {
-          console.warn('Failed to remove item from localStorage:', e);
-        }
+      if (hasSelectedCells()) {
+        showResetModal();
+      } else {
+        resetBingoCard();
       }
-      generateBingoCard();
     });
   }
+  
+  // Set up modal buttons
+  const cancelButton = document.getElementById('cancel-reset');
+  if (cancelButton) {
+    cancelButton.addEventListener('click', hideResetModal);
+  }
+  
+  const confirmButton = document.getElementById('confirm-reset');
+  if (confirmButton) {
+    confirmButton.addEventListener('click', resetBingoCard);
+  }
+  
+  // Allow clicking outside the modal to cancel
+  const modalOverlay = document.getElementById('reset-modal');
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        hideResetModal();
+      }
+    });
+  }
+  
+  // Add keyboard support for the modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
+      hideResetModal();
+    }
+  });
   
   // Check if localStorage is available before attempting to load saved state
   if (isLocalStorageAvailable()) {
